@@ -25,4 +25,5 @@ public interface ExpenseService {
     List<Expense> readByName(String keyword, Pageable page);
 
     List<Expense> readByDate(Date dateAfter, Date dateBefore, Pageable pageable);
+
 }

@@ -16,19 +16,24 @@ import java.util.Optional;
 public class ExpenseServiceImpl implements ExpenseService {
 
     private final ExpenseRepository expenseRepo;
+    private final UserService userService;
 
-    public ExpenseServiceImpl(ExpenseRepository expenseRepo) {
+    public ExpenseServiceImpl(ExpenseRepository expenseRepo, UserService userService) {
         this.expenseRepo = expenseRepo;
+        this.userService = userService;
     }
 
     @Override
     public Page<Expense> getAllExpenses(Pageable page) {
-        return expenseRepo.findAll(page);
+        return expenseRepo.findByUserId(userService.getLoggedInUser().getId(), page);
     }
 
     @Override
     public Expense getExpenseById(Long id) {
-        Optional<Expense> expense = expenseRepo.findById(id);
+        Optional<Expense> expense = expenseRepo.findByUserIdAndId(
+                userService.getLoggedInUser().getId(),
+                id
+        );
 
         if (expense.isPresent()) {
             return expense.get();
@@ -45,6 +50,8 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense saveExpenseDetails(Expense expense) {
+        expense.setUser(userService.getLoggedInUser());
+
         return expenseRepo.save(expense);
     }
 
@@ -63,12 +70,20 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> readByCategory(String category, Pageable page) {
-        return expenseRepo.findByCategory(category, page).stream().toList();
+        return expenseRepo.findByUserIdAndCategory(
+                userService.getLoggedInUser().getId(),
+                category,
+                page
+        ).stream().toList();
     }
 
     @Override
     public List<Expense> readByName(String keyword, Pageable page) {
-        return expenseRepo.findByNameContaining(keyword, page).stream().toList();
+        return expenseRepo.findByUserIdAndNameContaining(
+                userService.getLoggedInUser().getId(),
+                keyword,
+                page
+        ).stream().toList();
     }
 
     @Override
@@ -80,10 +95,16 @@ public class ExpenseServiceImpl implements ExpenseService {
             dateBefore = new Date(System.currentTimeMillis());
         }
 
-        Page<Expense> pages = expenseRepo.findByDateBetween(dateAfter, dateBefore, page) ;
+        Page<Expense> pages = expenseRepo.findByUserIdAndDateBetween(
+                userService.getLoggedInUser().getId(),
+                dateAfter,
+                dateBefore,
+                page
+        ) ;
 
         return pages.stream().toList();
     }
+
 
 
 }

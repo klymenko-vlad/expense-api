@@ -6,32 +6,38 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Optional;
 
 
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    Page<Expense> findByCategory(
+    Page<Expense> findByUserIdAndCategory(
+            Long userId,
             @NotBlank(message = "Category can't be null") String category,
             Pageable page
     );
 
-    Page<Expense> findByNameContaining(
+    Page<Expense> findByUserIdAndNameContaining(
+            Long userId,
             @NotBlank(message = "Expense name can't be null")
             @Size(min = 2, message = "Expense name needs to be at least 2 characters")
             String keyword,
             Pageable pageable
     );
 
-    Page<Expense> findByDateBetween(
+    Page<Expense> findByUserIdAndDateBetween(
+            Long userId,
             @NotNull(message = "Date can't be null") Date dateAfter,
             @NotNull(message = "Date can't be null") Date dateBefore,
             Pageable pageable
     );
+
+    Page<Expense> findByUserId(Long userId, Pageable page);
+
+    Optional<Expense> findByUserIdAndId(Long userId, Long expenseId);
 }
