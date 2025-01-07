@@ -70,7 +70,8 @@ public class WebSecurityConfig {
                 )
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("login", "register").permitAll() // Use 'requestMatchers' instead of 'antMatchers'
+                                .requestMatchers("login", "register", "/v3/api-docs/**",
+                                        "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());

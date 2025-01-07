@@ -1,5 +1,6 @@
 package com.klymenko.expenseapi.controller;
 
+import com.klymenko.expenseapi.entity.JwtResponse;
 import com.klymenko.expenseapi.entity.LoginModel;
 import com.klymenko.expenseapi.entity.User;
 import com.klymenko.expenseapi.entity.UserModel;
@@ -31,14 +32,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginModel login) {
+    public ResponseEntity<JwtResponse> login(@RequestBody LoginModel login) {
         Authentication authenticate = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword()));
+                .authenticate(
+                        new UsernamePasswordAuthenticationToken(login.getEmail(), login.getPassword())
+                );
 
         SecurityContextHolder.getContext().setAuthentication(authenticate);
 
         UserDetails userDetails = (UserDetails) authenticate.getPrincipal();
-        return new ResponseEntity<>(jwtUtils.generateToken(userDetails.getUsername()), HttpStatus.OK);
+        return new ResponseEntity<>(
+                new JwtResponse(jwtUtils.generateToken(userDetails.getUsername())),
+                HttpStatus.OK
+        );
     }
 
     @PostMapping("/register")
