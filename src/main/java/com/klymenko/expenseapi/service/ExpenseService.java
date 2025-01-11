@@ -1,7 +1,6 @@
 package com.klymenko.expenseapi.service;
 
-import com.klymenko.expenseapi.entity.Expense;
-import org.springframework.data.domain.Page;
+import com.klymenko.expenseapi.dto.ExpenseDTO;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
@@ -10,20 +9,20 @@ import java.util.List;
 
 public interface ExpenseService {
 
-    Page<Expense> getAllExpenses(Pageable page);
+    List<ExpenseDTO> getAllExpenses(Pageable page);
 
-    Expense getExpenseById(Long id);
+    ExpenseDTO getExpenseById(String expenseId);
 
-    void deleteExpenseById(Long id);
+    void deleteExpenseById(String expenseId);
 
-    Expense saveExpenseDetails(Expense expense);
+    ExpenseDTO saveExpenseDetails(ExpenseDTO expenseDTO);
 
-    Expense updateExpenseDetails(Long id, Expense expense);
+    ExpenseDTO updateExpenseDetails(String expenseId, ExpenseDTO expenseDTO);
 
-    List<Expense> readByCategory(String category, Pageable page);
+    List<ExpenseDTO> readByCategory(String category, Pageable page);
 
-    List<Expense> readByName(String keyword, Pageable page);
+    List<ExpenseDTO> readByName(String keyword, Pageable page);
 
-    List<Expense> readByDate(Date dateAfter, Date dateBefore, Pageable pageable);
+    List<ExpenseDTO> readByDate(Date dateAfter, Date dateBefore, Pageable pageable);
 
 }

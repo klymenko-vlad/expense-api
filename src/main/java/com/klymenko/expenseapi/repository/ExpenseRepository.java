@@ -16,11 +16,10 @@ import java.util.Optional;
 @Repository
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
-    Page<Expense> findByUserIdAndCategory(
-            Long userId,
-            @NotBlank(message = "Category can't be null") String category,
-            Pageable page
+    Page<Expense> findByUserIdAndCategoryId(
+            Long userId, Long categoryId, Pageable pageable
     );
+
 
     Page<Expense> findByUserIdAndNameContaining(
             Long userId,
@@ -39,5 +38,5 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     Page<Expense> findByUserId(Long userId, Pageable page);
 
-    Optional<Expense> findByUserIdAndId(Long userId, Long expenseId);
+    Optional<Expense> findByUserIdAndExpenseId(Long userId, String expenseId);
 }

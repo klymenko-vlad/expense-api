@@ -2,10 +2,8 @@ package com.klymenko.expenseapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,34 +13,36 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.sql.Date;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "tbl_expenses")
+@Builder
 public class Expense {
+
+    @Column(unique = true)
+    private String expenseId;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "expense_name")
-    @NotBlank(message = "Expense name can't be null")
-    @Size(min = 3, message = "Expense name needs to be at least 3 characters")
     private String name;
 
     private String description;
 
     @Column(name = "expense_amount")
-    @NotNull(message = "Expense amount can't be null")
     private BigDecimal amount;
 
-    @NotBlank(message = "Category can't be null")
-    private String category;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.RESTRICT)
+    private CategoryEntity category;
 
-    @NotNull(message = "Date can't be null")
     private Date date;
 
     @Column(name = "created_at", nullable = false, updatable = false)
