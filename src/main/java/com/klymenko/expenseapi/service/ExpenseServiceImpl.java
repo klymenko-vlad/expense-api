@@ -1,10 +1,10 @@
 package com.klymenko.expenseapi.service;
 
-import com.klymenko.expenseapi.dto.CategoryDTO;
 import com.klymenko.expenseapi.dto.ExpenseDTO;
 import com.klymenko.expenseapi.entity.CategoryEntity;
 import com.klymenko.expenseapi.entity.Expense;
 import com.klymenko.expenseapi.exceptions.ResourceNotFoundException;
+import com.klymenko.expenseapi.mappers.ExpenseMapper;
 import com.klymenko.expenseapi.repository.CategoryRepository;
 import com.klymenko.expenseapi.repository.ExpenseRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,19 +24,18 @@ public class ExpenseServiceImpl implements ExpenseService {
     private final CategoryRepository categoryRepository;
     private final ExpenseRepository expenseRepo;
     private final UserService userService;
+    private final ExpenseMapper expenseMapper;
 
     @Override
     public List<ExpenseDTO> getAllExpenses(Pageable page) {
         List<Expense> listOfExpenses = expenseRepo.findByUserId(userService.getLoggedInUser().getId(), page).stream().toList();
-        return listOfExpenses.stream().map(this::mapToDTO).toList();
+        return listOfExpenses.stream().map(expenseMapper::mapToExpenseDTO).toList();
     }
 
     @Override
     public ExpenseDTO getExpenseById(String expenseId) {
         Expense expense = getExpenseEntity(expenseId);
-
-        return mapToDTO(expense);
-
+        return expenseMapper.mapToExpenseDTO(expense);
     }
 
     private Expense getExpenseEntity(String expenseId) {
@@ -65,41 +64,11 @@ public class ExpenseServiceImpl implements ExpenseService {
         );
 
         expenseDTO.setExpenseId(UUID.randomUUID().toString());
-        Expense newExpense = mapToEntity(expenseDTO);
+        Expense newExpense = expenseMapper.mapToExpenseEntity(expenseDTO);
         newExpense.setCategory(category);
         newExpense.setUser(userService.getLoggedInUser());
         newExpense = expenseRepo.save(newExpense);
-        return mapToDTO(newExpense);
-    }
-
-    private ExpenseDTO mapToDTO(Expense newExpense) {
-        return ExpenseDTO.builder()
-                .expenseId(newExpense.getExpenseId())
-                .name(newExpense.getName())
-                .description(newExpense.getDescription())
-                .amount(newExpense.getAmount())
-                .date(newExpense.getDate())
-                .createdAt(newExpense.getCreatedAt())
-                .updatedAt(newExpense.getUpdatedAt())
-                .categoryDTO(mapToCategoryDTO(newExpense.getCategory()))
-                .build();
-    }
-
-    private CategoryDTO mapToCategoryDTO(CategoryEntity category) {
-        return CategoryDTO.builder()
-                .name(category.getName())
-                .categoryId(category.getCategoryId())
-                .build();
-    }
-
-    private Expense mapToEntity(ExpenseDTO expenseDTO) {
-        return Expense.builder()
-                .expenseId(expenseDTO.getExpenseId())
-                .name(expenseDTO.getName())
-                .description(expenseDTO.getDescription())
-                .date(expenseDTO.getDate())
-                .amount(expenseDTO.getAmount())
-                .build();
+        return expenseMapper.mapToExpenseDTO(newExpense);
     }
 
     @Override
@@ -123,7 +92,7 @@ public class ExpenseServiceImpl implements ExpenseService {
         existingExpense.setDate(expenseDTO.getDate() != null ? expenseDTO.getDate() : existingExpense.getDate());
 
         existingExpense = expenseRepo.save(existingExpense);
-        return mapToDTO(existingExpense);
+        return expenseMapper.mapToExpenseDTO(existingExpense);
     }
 
     @Override
@@ -137,7 +106,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 categoryEntity.getId(),
                 page
         ).stream().toList();
-        return list.stream().map(this::mapToDTO).toList();
+        return list.stream().map(expenseMapper::mapToExpenseDTO).toList();
     }
 
     @Override
@@ -148,7 +117,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 page
         ).stream().toList();
 
-        return list.stream().map(this::mapToDTO).toList();
+        return list.stream().map(expenseMapper::mapToExpenseDTO).toList();
     }
 
     @Override
@@ -167,7 +136,7 @@ public class ExpenseServiceImpl implements ExpenseService {
                 page
         );
 
-        return expenseList.stream().map(this::mapToDTO).toList();
+        return expenseList.stream().map(expenseMapper::mapToExpenseDTO).toList();
     }
 
 
